@@ -1,6 +1,8 @@
 # VirtualBox CentOS 7 x86_64 mini
 ***
 
+Wojciech Fornal <wojciech.fornal@gmail.com>
+
 VirtualBox foundation for Vagrant base box. Just a basic setup to have:
 
 - development tools
@@ -11,8 +13,6 @@ VirtualBox foundation for Vagrant base box. Just a basic setup to have:
 - default user `vagrant` (with default keys)
 
 Tweaking and hardening is supposed to be performed during provisioning.
-
-Wojciech Fornal <wojciech.fornal@gmail.com>
 
 ## Networking
 
@@ -156,11 +156,13 @@ sudo sh /media/cdrom/VBoxLinuxAdditions.run
 
 ## Users
 
-### vagrant (the default, insecure)
+### vagrant
+
+#### the default, insecure settings
 
 During OS installation, create default user (administrator) `vagrant` with password `vagrant`.
 
-Store the default private key somewhere in the host OS. Here's the content.
+Store the default private key somewhere (where SSH expects it to be) in the host OS. Here's the content.
 
 ```text
 -----BEGIN RSA PRIVATE KEY-----
@@ -196,6 +198,62 @@ Store the following public key in `~/.ssh/vagrant.pub`
 ```text
 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key
 ```
+
+#### passwordless sudo
+
+If `vagrant` user was created with admin role during OS install it will be added
+to the `wheel` group which gives members the ability to run all commands. "Unluckily" Vagrant wants to run commands without password.
+
+Remember to **not edit /etc/sudoers file directly**. Use `visudo` which is
+better and safer way to deal with `/etc/sudoers` file for a couple of reasons.
+
+You can either uncomment following line in `/etc/sudoers` (not recommended):
+
+```text
+# %wheel        ALL=(ALL)       NOPASSWD: ALL
+```
+or explicitly declare privilege for the `vagrant` user by adding following:
+
+```text
+vagrant         ALL=(ALL)       NOPASSWD: ALL
+```
+## Shared folders
+
+Having machine selected in VirtualBox choose `Settings > Shared Folders`. Pick
+host location (I use `f:\box-dev1`), change default `box-dev1` folder name (optionally) and select the `Auto-mount` option.
+
+There should now be a folder prefixed with `sf_` (In my case it is `sf_box-dev1`) in `/media` directory which we can't access for the heck of it. Go to `/media` directory
+and type:
+
+    ls -aliF
+
+Note the shared directory does not have inode. Moreover, it is owned by `root` user
+and members of the `vboxsf` group. Now type:
+
+    df -T
+
+We can see the folder is a filesystem of type `vboxsf` mounted at
+`/media/sf_box-dev1` (or other directory depending on what you selected). Just an
+interesting (and obvious) fact. We do not need any further special mounting.
+Just add `vagrant` user to the `vboxsf` group by editing `/etc/group` file.
+
+```text
+vboxsf:x:994:vagrant
+```
+or (preferred) by using following command
+
+    sudo usermod -G vboxsf vagrant
+    
+To make changes effective execute
+
+    su - vagrant
+    
+Then check by
+
+    id -Gn
+    
+It should tell that `vagrant` user belongs to `vagrant` and `vboxsf` groups. Shared
+folder should now be accessible for read and write operations.
 
 ## Checks and diagnostics
 
