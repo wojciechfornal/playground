@@ -1,0 +1,49 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>001 Pseudo-random noise with tweaks</title>
+
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+    <main>
+        <h1>001 Pseudo-random noise with tweaks</h1>
+        <div>
+            <canvas id="main" width="640" height="480"></canvas>
+            <canvas id="palette" width="640" height="20"></canvas>
+            <form>
+                <fieldset>
+                    <legend>Noise controls</legend>
+                    <div class="form-control">
+                        <p>Vibrance</p><span id="vibranceText">15</span>
+                        <label for="vibranceSlider">Vibrance</label>
+                        <input type="range" id="vibranceSlider" name="vibranceSlider"  min="0" max="100" step="1" value="15">
+                    </div>
+                    <div class="form-control">
+                        <p>Color range </p><span id="colorRangeMinText">0</span> - <span id="colorRangeMaxText">255</span>
+                        <label for="colorRangeMin">Min</label>
+                        <input type="range" id="colorRangeMin" name="colorRangeMin"  min="0" max="255" step="1" value="0">
+                    </div>
+                    <div class="form-control">
+                        <label for="colorRangeMax">Max</label>
+                        <input type="range" id="colorRangeMax" name="colorRangeMax"  min="0" max="255" step="1" value="0" class="flip">
+                    </div>
+                    <div class="form-control">
+                        <p>Middle threshold</p><span id="middleThresholdText">1</span>
+                        <label for="middleThreshold">Middle threshold</label>
+                        <input type="range" id="middleThreshold" name="middleThreshold"  min="0.01" max="1" step="0.01" value="1">
+                    </div>
+                    <div class="form-control">
+                        <p>Cell size</p><span id="cellSizeText">10</span>
+                        <label for="cellSize">Cell size</label>
+                        <input type="range" id="cellSize" name="cellSize"  min="2" max="20" step="2" value="10">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <footer><small>Wojciech Fornal</small></footer>
+    </main>
+    <script src="js/main.js"></script>
+</body>
+</html>
